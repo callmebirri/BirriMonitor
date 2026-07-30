@@ -220,4 +220,10 @@ Feel free to check the [issues page](https://github.com/callmebirri/BirriMonitor
 **This software is provided "as is", without any warranty.** Use at your own risk. The author is not responsible for any damage or data loss caused by this tool.
 
 ---
-*Developed with ❤️ by birri*
+<div align="center">
+
+Developed with ❤️ by **birri**
+
+Copyright © 2026 birri
+
+</div>
