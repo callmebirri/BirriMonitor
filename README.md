@@ -192,5 +192,3 @@ Uses TLS (Thread Local Storage) to prevent recursive hook calls. When inside a h
 - Method C (DLL hijacking) is not implemented
 - DLL must be injected before the target process calls WinHTTP functions to ensure complete hooking
 - No HTTPS decryption support (raw data logging only)
-
-<a href="https://github.com/callmebirri/BirriMonitor">BirriMonitor</a> © 2026 by <a href="https://qhuyy.tech/">birri</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;">
