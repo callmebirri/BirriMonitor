@@ -1,0 +1,104 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  SOLUTION_FILE_PATH: BirriMonitor.sln
+  BUILD_CONFIGURATION: Release
+  BUILD_PLATFORM: x64
+  MSVC_TOOLSET: v145
+  MINHOOK_SOURCE_DIR: External/minhook
+  MINHOOK_BUILD_DIR: External/minhook/build_cmake
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Compute MinHook cache key
+        id: minhook-cache
+        shell: bash
+        run: |
+          HASH=$(sha256sum External/minhook/CMakeLists.txt | awk '{print $1}')
+          echo "key=minhook-build-${{ env.MSVC_TOOLSET }}-${HASH}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore MinHook build cache
+        id: minhook-restore
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.MINHOOK_BUILD_DIR }}
+          key: ${{ steps.minhook-cache.outputs.key }}
+          restore-keys: minhook-build-${{ env.MSVC_TOOLSET }}-
+
+      - name: Build MinHook (Debug + Release)
+        if: steps.minhook-restore.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          if exist "${{ env.MINHOOK_BUILD_DIR }}\CMakeCache.txt" rmdir /s /q "${{ env.MINHOOK_BUILD_DIR }}"
+          cmake -S "${{ env.MINHOOK_SOURCE_DIR }}" -B "${{ env.MINHOOK_BUILD_DIR }}" -A x64 -T ${{ env.MSVC_TOOLSET }}
+          cmake --build "${{ env.MINHOOK_BUILD_DIR }}" --config Debug
+          cmake --build "${{ env.MINHOOK_BUILD_DIR }}" --config Release
+
+      - name: Confirm MinHook libraries exist
+        shell: cmd
+        run: |
+          if not exist "${{ env.MINHOOK_BUILD_DIR }}\Debug\minhook.x64d.lib" (
+            echo MinHook Debug lib missing — build failed or cache corrupted.
+            exit 1
+          )
+          if not exist "${{ env.MINHOOK_BUILD_DIR }}\Release\minhook.x64.lib" (
+            echo MinHook Release lib missing — build failed or cache corrupted.
+            exit 1
+          )
+
+      - name: Build solution (Release|x64)
+        shell: cmd
+        run: |
+          msbuild "%SOLUTION_FILE_PATH%" ^
+            /p:Configuration=%BUILD_CONFIGURATION% ^
+            /p:Platform=%BUILD_PLATFORM% ^
+            /p:PlatformToolset=%MSVC_TOOLSET% ^
+            /m
+
+      - name: Confirm build outputs exist
+        shell: cmd
+        run: |
+          if not exist "x64\Release\BirriMonitor.dll" (
+            echo BirriMonitor.dll not found — build failed.
+            exit 1
+          )
+          if not exist "x64\Release\BirriLogger.exe" (
+            echo BirriLogger.exe not found — build failed.
+            exit 1
+          )
+          if not exist "x64\Release\BirriLauncher.exe" (
+            echo BirriLauncher.exe not found — build failed.
+            exit 1
+          )
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: BirriMonitor-${{ github.run_number }}-${{ github.sha }}
+          path: |
+            x64/Release/BirriMonitor.dll
+            x64/Release/BirriMonitor.pdb
+            x64/Release/BirriLogger.exe
+            x64/Release/BirriLogger.pdb
+            x64/Release/BirriLauncher.exe
+            x64/Release/BirriLauncher.pdb
+          if-no-files-found: error
