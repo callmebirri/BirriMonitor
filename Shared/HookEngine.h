@@ -4,6 +4,7 @@
 #include <vector>
 #include <mutex>
 #include <memory>
+#include <atomic>
 
 
 class IpcClient;
@@ -25,13 +26,16 @@ public:
                     const void* data, size_t dataSize);
 
 
-    bool IsReady() const { return m_initialized && m_hooksReady; }
+    bool IsReady() const;
 
 
     bool IsInHook() const;
     void SetInHook(bool inHook);
 
 private:
+    friend class IpcClient;
+
+    static DWORD WINAPI InitThread(void*);
 
     bool InstallHooks();
 
@@ -45,27 +49,12 @@ private:
     std::unique_ptr<IpcClient> m_ipcClient;
 
 
-    bool m_initialized;
-    bool m_hooksReady;
-
-
     DWORD m_tlsIndex;
 
 
-    CRITICAL_SECTION m_cs;
+    std::mutex m_cs;
 };
 
 
 extern HookEngine g_hookEngine;
-
-
-#define GUARD_HOOK() \
-    if (g_hookEngine.IsInHook()) return; \
-    ScopedHookGuard hookGuard;
-
-
-class ScopedHookGuard {
-public:
-    ScopedHookGuard() { g_hookEngine.SetInHook(true); }
-    ~ScopedHookGuard() { g_hookEngine.SetInHook(false); }
-};
+extern std::atomic<bool> g_hooksReady;

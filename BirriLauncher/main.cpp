@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include "../Shared/IpcCommon.h"
 
 
 bool InjectMethodA(const wchar_t* exePath, const wchar_t* dllPath) {
@@ -90,11 +91,21 @@ bool InjectMethodA(const wchar_t* exePath, const wchar_t* dllPath) {
 
 
 
-    std::cout << "[*] Waiting for handshake..." << std::endl;
-    Sleep(2000);
-
-
+    std::cout << "[*] Waiting for hooks ready..." << std::endl;
     ResumeThread(pi.hThread);
+
+    HANDLE hReady = OpenEventW(SYNCHRONIZE, FALSE, HOOKS_READY_EVENT_NAME);
+    if (hReady) {
+        DWORD waitResult = WaitForSingleObject(hReady, 10000);
+        CloseHandle(hReady);
+        if (waitResult == WAIT_OBJECT_0) {
+            std::cout << "[+] Hooks ready" << std::endl;
+        } else {
+            std::cout << "[!] Timeout waiting for hooks" << std::endl;
+        }
+    } else {
+        std::cout << "[!] Could not open ready event, continuing anyway" << std::endl;
+    }
     std::cout << "[+] Process resumed" << std::endl;
 
     CloseHandle(pi.hThread);

@@ -1,10 +1,11 @@
 #include "pch.h"
 #include "HookEngine.h"
 #include "WinHttpHooks.h"
-#include <windows.h>
 #include <winhttp.h>
 #include <MinHook.h>
 #include <string>
+#include <map>
+#include <mutex>
 
 
 typedef HINTERNET (WINAPI* WinHttpOpenRequest_t)(
@@ -48,11 +49,35 @@ typedef BOOL (WINAPI* WinHttpQueryHeaders_t)(
     LPDWORD lpdwIndex
 );
 
+typedef BOOL (WINAPI* WinHttpCloseHandle_t)(
+    HINTERNET hInternet
+);
+
+
 static WinHttpOpenRequest_t Original_WinHttpOpenRequest = nullptr;
 static WinHttpSendRequest_t Original_WinHttpSendRequest = nullptr;
 static WinHttpReceiveResponse_t Original_WinHttpReceiveResponse = nullptr;
 static WinHttpReadData_t Original_WinHttpReadData = nullptr;
 static WinHttpQueryHeaders_t Original_WinHttpQueryHeaders = nullptr;
+static WinHttpCloseHandle_t Original_WinHttpCloseHandle = nullptr;
+
+
+struct RequestContext {
+    uint64_t uniqueId;
+    std::wstring verb;
+    std::wstring objectName;
+    std::wstring headers;
+};
+
+
+static std::map<HINTERNET, RequestContext> g_requestContexts;
+static std::mutex g_requestContextsMutex;
+static std::atomic<uint64_t> g_nextUniqueId{1};
+
+
+static uint64_t AllocUniqueId() {
+    return g_nextUniqueId.fetch_add(1, std::memory_order_relaxed);
+}
 
 
 HINTERNET WINAPI Hooked_WinHttpOpenRequest(
@@ -77,15 +102,28 @@ HINTERNET WINAPI Hooked_WinHttpOpenRequest(
                                                    lplpszAcceptTypes, dwFlags);
 
     if (result && g_hookEngine.IsReady()) {
+        uint64_t uid = AllocUniqueId();
+        RequestContext ctx;
+        ctx.uniqueId = uid;
+        ctx.verb = lpszVerb ? lpszVerb : L"GET";
+        ctx.objectName = lpszObjectName ? lpszObjectName : L"";
+
+        {
+            std::lock_guard<std::mutex> lock(g_requestContextsMutex);
+            g_requestContexts[result] = std::move(ctx);
+        }
+
         HttpMetadata metadata;
         metadata.isRequest = true;
         metadata.connectionId = (uint64_t)hConnect;
-        metadata.requestId = (uint64_t)result;
+        metadata.requestId = uid;
+
+        wcsncpy_s(metadata.url, lpszObjectName ? lpszObjectName : L"", _TRUNCATE);
 
         std::wstring logMsg = L"WinHttpOpenRequest: ";
-        if (lpszVerb) logMsg += lpszVerb;
+        logMsg += ctx.verb;
         logMsg += L" ";
-        if (lpszObjectName) logMsg += lpszObjectName;
+        logMsg += ctx.objectName;
 
         g_hookEngine.SendMessage(MessageType::LOG_MESSAGE, &metadata,
                                 logMsg.c_str(), (logMsg.length() + 1) * sizeof(wchar_t));
@@ -113,12 +151,36 @@ BOOL WINAPI Hooked_WinHttpSendRequest(
 
     g_hookEngine.SetInHook(true);
 
-    if (g_hookEngine.IsReady() && lpOptional && dwOptionalLength > 0) {
-        HttpMetadata metadata;
-        metadata.isRequest = true;
-        metadata.requestId = (uint64_t)hRequest;
+    if (g_hookEngine.IsReady()) {
+        std::lock_guard<std::mutex> lock(g_requestContextsMutex);
+        auto it = g_requestContexts.find(hRequest);
+        if (it != g_requestContexts.end()) {
+            if (lpszHeaders) {
+                if (dwHeadersLength == (DWORD)-1) {
+                    it->second.headers = lpszHeaders;
+                } else {
+                    it->second.headers.assign(lpszHeaders, dwHeadersLength / sizeof(wchar_t));
+                }
+            }
+        }
+    }
 
-        g_hookEngine.SendMessage(MessageType::HTTP_REQUEST, &metadata, lpOptional, dwOptionalLength);
+    if (g_hookEngine.IsReady() && lpOptional && dwOptionalLength > 0) {
+        uint64_t uid = 0;
+        {
+            std::lock_guard<std::mutex> lock(g_requestContextsMutex);
+            auto it = g_requestContexts.find(hRequest);
+            if (it != g_requestContexts.end()) {
+                uid = it->second.uniqueId;
+            }
+        }
+
+        if (uid != 0) {
+            HttpMetadata metadata;
+            metadata.isRequest = true;
+            metadata.requestId = uid;
+            g_hookEngine.SendMessage(MessageType::HTTP_REQUEST, &metadata, lpOptional, dwOptionalLength);
+        }
     }
 
     BOOL result = Original_WinHttpSendRequest(hRequest, lpszHeaders, dwHeadersLength,
@@ -143,12 +205,23 @@ BOOL WINAPI Hooked_WinHttpReceiveResponse(
     BOOL result = Original_WinHttpReceiveResponse(hRequest, lpReserved);
 
     if (result && g_hookEngine.IsReady()) {
-        HttpMetadata metadata;
-        metadata.isRequest = false;
-        metadata.requestId = (uint64_t)hRequest;
+        uint64_t uid = 0;
+        {
+            std::lock_guard<std::mutex> lock(g_requestContextsMutex);
+            auto it = g_requestContexts.find(hRequest);
+            if (it != g_requestContexts.end()) {
+                uid = it->second.uniqueId;
+            }
+        }
 
-        g_hookEngine.SendMessage(MessageType::LOG_MESSAGE, &metadata,
-                                "WinHttpReceiveResponse: Success", 28);
+        if (uid != 0) {
+            HttpMetadata metadata;
+            metadata.isRequest = false;
+            metadata.requestId = uid;
+
+            g_hookEngine.SendMessage(MessageType::LOG_MESSAGE, &metadata,
+                                    "WinHttpReceiveResponse: Success", 28);
+        }
     }
 
     g_hookEngine.SetInHook(false);
@@ -170,13 +243,47 @@ BOOL WINAPI Hooked_WinHttpReadData(
 
     BOOL result = Original_WinHttpReadData(hRequest, lpBuffer, dwNumberOfBytesToRead, lpdwNumberOfBytesRead);
 
-    if (result && g_hookEngine.IsReady() && lpBuffer && lpdwNumberOfBytesRead && *lpdwNumberOfBytesRead > 0) {
-        HttpMetadata metadata;
-        metadata.isRequest = false;
-        metadata.requestId = (uint64_t)hRequest;
+    DWORD lastErr = GetLastError();
 
-        g_hookEngine.SendMessage(MessageType::HTTP_RESPONSE, &metadata, lpBuffer, *lpdwNumberOfBytesRead);
+    if ((result || lastErr == ERROR_MORE_DATA) && g_hookEngine.IsReady() && lpBuffer && lpdwNumberOfBytesRead && *lpdwNumberOfBytesRead > 0) {
+        uint64_t uid = 0;
+        {
+            std::lock_guard<std::mutex> lock(g_requestContextsMutex);
+            auto it = g_requestContexts.find(hRequest);
+            if (it != g_requestContexts.end()) {
+                uid = it->second.uniqueId;
+            }
+        }
+
+        if (uid != 0) {
+            HttpMetadata metadata;
+            metadata.isRequest = false;
+            metadata.requestId = uid;
+            g_hookEngine.SendMessage(MessageType::HTTP_RESPONSE, &metadata, lpBuffer, *lpdwNumberOfBytesRead);
+        }
     }
+
+    g_hookEngine.SetInHook(false);
+    return result;
+}
+
+
+BOOL WINAPI Hooked_WinHttpCloseHandle(
+    HINTERNET hInternet
+) {
+    if (g_hookEngine.IsInHook()) {
+        return Original_WinHttpCloseHandle(hInternet);
+    }
+
+    g_hookEngine.SetInHook(true);
+
+
+    {
+        std::lock_guard<std::mutex> lock(g_requestContextsMutex);
+        g_requestContexts.erase(hInternet);
+    }
+
+    BOOL result = Original_WinHttpCloseHandle(hInternet);
 
     g_hookEngine.SetInHook(false);
     return result;
@@ -228,8 +335,9 @@ bool InstallWinHttpHooks() {
     void* pReceiveResponse = (void*)GetProcAddress(hWinHttp, "WinHttpReceiveResponse");
     void* pReadData = (void*)GetProcAddress(hWinHttp, "WinHttpReadData");
     void* pQueryHeaders = (void*)GetProcAddress(hWinHttp, "WinHttpQueryHeaders");
+    void* pCloseHandle = (void*)GetProcAddress(hWinHttp, "WinHttpCloseHandle");
 
-    if (!pOpenRequest || !pSendRequest || !pReceiveResponse || !pReadData || !pQueryHeaders) {
+    if (!pOpenRequest || !pSendRequest || !pReceiveResponse || !pReadData || !pQueryHeaders || !pCloseHandle) {
         MH_Uninitialize();
         return false;
     }
@@ -256,6 +364,11 @@ bool InstallWinHttpHooks() {
     }
 
     if (MH_CreateHook(pQueryHeaders, &Hooked_WinHttpQueryHeaders, (void**)&Original_WinHttpQueryHeaders) != MH_OK) {
+        MH_Uninitialize();
+        return false;
+    }
+
+    if (MH_CreateHook(pCloseHandle, &Hooked_WinHttpCloseHandle, (void**)&Original_WinHttpCloseHandle) != MH_OK) {
         MH_Uninitialize();
         return false;
     }

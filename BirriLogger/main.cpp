@@ -10,6 +10,7 @@
 #include <map>
 #include <chrono>
 #include <iomanip>
+#include <mutex>
 #include "../Shared/IpcCommon.h"
 
 
@@ -21,6 +22,7 @@ struct HttpTransaction {
     std::string requestData;
     std::string responseData;
     std::string timestamp;
+    std::wstring url;
     uint64_t requestId;
     bool hasRequest;
     bool hasResponse;
@@ -30,6 +32,7 @@ struct HttpTransaction {
 
 
 std::map<uint64_t, HttpTransaction> g_transactions;
+std::mutex g_transactionsMutex;
 
 
 void PrintTransaction(const HttpTransaction& trans);
@@ -51,47 +54,52 @@ std::string GetTimestamp() {
 }
 
 
-void BufferMessage(const IpcMessage* msg) {
+void BufferMessage(const IpcMessageWire* msg, size_t bytesRead) {
+    if (bytesRead < sizeof(MessageHeader) + sizeof(HttpMetadata)) return;
+
     uint64_t requestId = msg->metadata.requestId;
 
-    if (msg->header.type == MessageType::HTTP_REQUEST) {
-        HttpTransaction trans;
-        trans.requestId = requestId;
-        trans.timestamp = GetTimestamp();
-        trans.hasRequest = true;
+    size_t headerLen = msg->header.length;
+    if (headerLen > bytesRead) return;
 
+    size_t dataSize = headerLen - sizeof(MessageHeader) - sizeof(HttpMetadata);
+    if (dataSize > MAX_MESSAGE_SIZE) dataSize = MAX_MESSAGE_SIZE;
 
-        size_t dataSize = msg->header.length - sizeof(MessageHeader) - sizeof(HttpMetadata);
-        if (dataSize > 0 && msg->data) {
-            trans.requestData = std::string(reinterpret_cast<const char*>(msg->data), dataSize);
-        }
+    const uint8_t* dataPtr = msg->data;
+    if (dataSize > 0 && dataPtr) {
 
-        g_transactions[requestId] = trans;
+        std::lock_guard<std::mutex> lock(g_transactionsMutex);
 
-    } else if (msg->header.type == MessageType::HTTP_RESPONSE) {
-        auto it = g_transactions.find(requestId);
-        if (it != g_transactions.end()) {
-            it->second.hasResponse = true;
-
-
-            size_t dataSize = msg->header.length - sizeof(MessageHeader) - sizeof(HttpMetadata);
-            if (dataSize > 0 && msg->data) {
-                it->second.responseData = std::string(reinterpret_cast<const char*>(msg->data), dataSize);
-            }
-
-
-            PrintTransaction(it->second);
-
-
-            g_transactions.erase(it);
-        } else {
-
+        if (msg->header.type == MessageType::HTTP_REQUEST) {
             HttpTransaction trans;
             trans.requestId = requestId;
             trans.timestamp = GetTimestamp();
-            trans.hasResponse = true;
-            trans.responseData = "Response without matching request";
-            PrintTransaction(trans);
+            trans.hasRequest = true;
+            trans.url = msg->metadata.url;
+
+            trans.requestData = std::string(reinterpret_cast<const char*>(dataPtr), dataSize);
+
+            g_transactions[requestId] = trans;
+
+        } else if (msg->header.type == MessageType::HTTP_RESPONSE) {
+            auto it = g_transactions.find(requestId);
+            if (it != g_transactions.end()) {
+                it->second.hasResponse = true;
+
+                it->second.responseData += std::string(reinterpret_cast<const char*>(dataPtr), dataSize);
+
+                PrintTransaction(it->second);
+
+                g_transactions.erase(it);
+            } else {
+
+                HttpTransaction trans;
+                trans.requestId = requestId;
+                trans.timestamp = GetTimestamp();
+                trans.hasResponse = true;
+                trans.responseData = "Response without matching request";
+                PrintTransaction(trans);
+            }
         }
     }
 }
@@ -101,17 +109,17 @@ void PrintTransaction(const HttpTransaction& trans) {
 
     std::cout << "\n────────────────────────────────────────────────────────\n";
 
-
     std::cout << trans.timestamp << "\n";
 
+    if (!trans.url.empty()) {
+        std::wcout << L"URL: " << trans.url << L"\n";
+    }
 
     if (trans.hasRequest && !trans.requestData.empty()) {
         std::cout << "\n--> ";
 
-
         std::istringstream requestStream(trans.requestData);
         std::string line;
-
 
         if (std::getline(requestStream, line)) {
 
@@ -119,13 +127,11 @@ void PrintTransaction(const HttpTransaction& trans) {
             std::cout << line << "\n";
         }
 
-
         while (std::getline(requestStream, line)) {
             if (!line.empty() && line.back() == '\r') line.pop_back();
             if (line.empty()) break;
             std::cout << line << "\n";
         }
-
 
         std::string body;
         while (std::getline(requestStream, line)) {
@@ -138,26 +144,22 @@ void PrintTransaction(const HttpTransaction& trans) {
         std::cout << "\n--> (no request data)\n";
     }
 
-
     if (trans.hasResponse && !trans.responseData.empty()) {
         std::cout << "\n<-- ";
 
         std::istringstream responseStream(trans.responseData);
         std::string line;
 
-
         if (std::getline(responseStream, line)) {
             if (!line.empty() && line.back() == '\r') line.pop_back();
             std::cout << line << "\n";
         }
-
 
         while (std::getline(responseStream, line)) {
             if (!line.empty() && line.back() == '\r') line.pop_back();
             if (line.empty()) break;
             std::cout << line << "\n";
         }
-
 
         std::string body;
         while (std::getline(responseStream, line)) {
@@ -174,16 +176,18 @@ void PrintTransaction(const HttpTransaction& trans) {
 }
 
 
-void HandleMessage(const IpcMessage* msg);
-void ParseAndPrintHttp(const IpcMessage* msg);
+void HandleMessage(const IpcMessageWire* msg, size_t bytesRead);
 
 
 class IpcServer {
 public:
-    IpcServer() : m_pipe(INVALID_HANDLE_VALUE), m_running(false) {}
+    IpcServer() : m_pipe(INVALID_HANDLE_VALUE), m_running(false), m_stopEvent(nullptr) {}
     ~IpcServer() { Stop(); }
 
     bool Start() {
+        m_stopEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+        if (!m_stopEvent) return false;
+
         m_running = true;
         m_thread = std::thread(&IpcServer::ServerThread, this);
         return true;
@@ -191,6 +195,9 @@ public:
 
     void Stop() {
         m_running = false;
+        if (m_stopEvent) {
+            SetEvent(m_stopEvent);
+        }
         if (m_pipe != INVALID_HANDLE_VALUE) {
             DisconnectNamedPipe(m_pipe);
             CloseHandle(m_pipe);
@@ -198,6 +205,10 @@ public:
         }
         if (m_thread.joinable()) {
             m_thread.join();
+        }
+        if (m_stopEvent) {
+            CloseHandle(m_stopEvent);
+            m_stopEvent = nullptr;
         }
     }
 
@@ -209,7 +220,7 @@ private:
                 PIPE_NAME,
                 PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
-                1,
+                PIPE_UNLIMITED,
                 PIPE_BUFFER_SIZE,
                 PIPE_BUFFER_SIZE,
                 0,
@@ -221,15 +232,34 @@ private:
                 return;
             }
 
-
             OVERLAPPED overlapped = {0};
             overlapped.hEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+            if (!overlapped.hEvent) {
+                CloseHandle(m_pipe);
+                m_pipe = INVALID_HANDLE_VALUE;
+                return;
+            }
 
             ConnectNamedPipe(m_pipe, &overlapped);
-            DWORD waitResult = WaitForSingleObject(overlapped.hEvent, 5000);
+
+            HANDLE waitHandles[2] = { overlapped.hEvent, m_stopEvent };
+            DWORD waitResult = WaitForMultipleObjects(2, waitHandles, FALSE, INFINITE);
             CloseHandle(overlapped.hEvent);
 
+            if (waitResult == WAIT_OBJECT_0 + 1) {
+
+                CancelIo(m_pipe);
+                CloseHandle(m_pipe);
+                m_pipe = INVALID_HANDLE_VALUE;
+                break;
+            }
+
             if (waitResult == WAIT_OBJECT_0) {
+                DWORD dummy = 0;
+                if (!GetOverlappedResult(m_pipe, &overlapped, &dummy, TRUE)) {
+
+                }
+
                 std::cout << "[*] DLL connected" << std::endl;
                 ReceiveMessages();
                 DisconnectNamedPipe(m_pipe);
@@ -248,7 +278,8 @@ private:
             BOOL result = ReadFile(m_pipe, buffer.data(), PIPE_BUFFER_SIZE, &bytesRead, nullptr);
 
             if (!result) {
-                if (GetLastError() == ERROR_BROKEN_PIPE) {
+                DWORD err = GetLastError();
+                if (err == ERROR_BROKEN_PIPE || err == ERROR_PIPE_NOT_CONNECTED) {
                     std::cout << "[*] DLL disconnected" << std::endl;
                     break;
                 }
@@ -259,26 +290,37 @@ private:
                 continue;
             }
 
-
-            const IpcMessage* msg = reinterpret_cast<const IpcMessage*>(buffer.data());
-
+            const IpcMessageWire* msg = DeserializeIpcMessage(buffer.data());
 
             if (msg->header.magic != 0xB17A) {
                 std::cerr << "[!] Invalid message magic" << std::endl;
                 continue;
             }
 
-            HandleMessage(msg);
+            uint32_t declaredLength = msg->header.length;
+            if (declaredLength < sizeof(MessageHeader) || declaredLength > bytesRead) {
+                std::cerr << "[!] Invalid message length: " << declaredLength
+                          << " (bytesRead=" << bytesRead << ")" << std::endl;
+                continue;
+            }
+
+            if (declaredLength > PIPE_BUFFER_SIZE) {
+                std::cerr << "[!] Message too large: " << declaredLength << std::endl;
+                continue;
+            }
+
+            HandleMessage(msg, bytesRead);
         }
     }
 
     HANDLE m_pipe;
     bool m_running;
     std::thread m_thread;
+    HANDLE m_stopEvent;
 };
 
 
-void HandleMessage(const IpcMessage* msg) {
+void HandleMessage(const IpcMessageWire* msg, size_t bytesRead) {
     switch (msg->header.type) {
         case MessageType::HOOKS_READY:
             std::cout << "[*] Hooks ready (PID: " << msg->header.processId
@@ -288,7 +330,7 @@ void HandleMessage(const IpcMessage* msg) {
         case MessageType::HTTP_REQUEST:
         case MessageType::HTTP_RESPONSE:
 
-            BufferMessage(msg);
+            BufferMessage(msg, bytesRead);
             break;
 
 
@@ -300,7 +342,6 @@ void HandleMessage(const IpcMessage* msg) {
 
 bool IsHttpData(const char* data, size_t size) {
     if (size < 5) return false;
-
 
     std::string start(data, (std::min)(size, (size_t)16));
     if (start.find("HTTP/") == 0) return true;
@@ -338,95 +379,19 @@ void PrintHexDump(const uint8_t* data, size_t size) {
 }
 
 
-void ParseAndPrintHttp(const IpcMessage* msg) {
-    const uint8_t* data = msg->data;
-    size_t dataSize = msg->header.length - sizeof(MessageHeader) - sizeof(HttpMetadata);
+static bool g_consoleCtrlHandled = false;
 
-    if (dataSize == 0 || !data) {
-        return;
+BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType) {
+    if (dwCtrlType == CTRL_C_EVENT || dwCtrlType == CTRL_BREAK_EVENT) {
+        g_consoleCtrlHandled = true;
+        return TRUE;
     }
-
-    std::string httpData(reinterpret_cast<const char*>(data), dataSize);
-
-    if (msg->header.type == MessageType::HTTP_REQUEST) {
-        std::cout << "\n--> ";
-
-
-
-        size_t firstLineEnd = httpData.find("\r\n");
-        if (firstLineEnd != std::string::npos) {
-            std::string firstLine = httpData.substr(0, firstLineEnd);
-            std::cout << firstLine << "\n";
-
-
-            size_t pos = firstLineEnd + 2;
-            while (pos < httpData.length()) {
-                size_t lineEnd = httpData.find("\r\n", pos);
-                if (lineEnd == std::string::npos || lineEnd == pos) {
-
-                    std::cout << "\n";
-                    pos = (lineEnd == pos) ? lineEnd + 2 : pos;
-                    break;
-                }
-
-                std::string headerLine = httpData.substr(pos, lineEnd - pos);
-                std::cout << headerLine << "\n";
-                pos = lineEnd + 2;
-            }
-
-
-            if (pos < httpData.length()) {
-                std::string body = httpData.substr(pos);
-                if (!body.empty() && body != "\r\n") {
-                    std::cout << body << "\n";
-                }
-            }
-        } else {
-
-            std::cout << httpData << "\n";
-        }
-
-    } else if (msg->header.type == MessageType::HTTP_RESPONSE) {
-        std::cout << "\n<-- ";
-
-
-
-        size_t firstLineEnd = httpData.find("\r\n");
-        if (firstLineEnd != std::string::npos) {
-            std::string statusLine = httpData.substr(0, firstLineEnd);
-            std::cout << statusLine << "\n";
-
-
-            size_t pos = firstLineEnd + 2;
-            while (pos < httpData.length()) {
-                size_t lineEnd = httpData.find("\r\n", pos);
-                if (lineEnd == std::string::npos || lineEnd == pos) {
-                    std::cout << "\n";
-                    pos = (lineEnd == pos) ? lineEnd + 2 : pos;
-                    break;
-                }
-
-                std::string headerLine = httpData.substr(pos, lineEnd - pos);
-                std::cout << headerLine << "\n";
-                pos = lineEnd + 2;
-            }
-
-
-            if (pos < httpData.length()) {
-                std::string body = httpData.substr(pos);
-                if (!body.empty() && body != "\r\n") {
-                    std::cout << body << "\n";
-                }
-            }
-        } else {
-            std::cout << httpData << "\n";
-        }
-    }
-
-    std::cout << std::endl;
+    return FALSE;
 }
 
 int main() {
+    SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
+
     std::cout << "BirriLogger - Network Traffic Monitor" << std::endl;
     std::cout << "Waiting for DLL connection..." << std::endl;
 
@@ -436,7 +401,7 @@ int main() {
         return 1;
     }
 
-    std::cout << "Press Enter to exit..." << std::endl;
+    std::cout << "Press Enter or Ctrl+C to exit..." << std::endl;
     std::cin.get();
 
     server.Stop();

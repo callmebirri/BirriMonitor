@@ -1,20 +1,18 @@
-
 #include "pch.h"
 #include "HookEngine.h"
-#include "WinHttpHooks.h"
+
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
                      )
 {
-    switch (ul_reason_for_call)
-    {
+    switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
 
-        if (!g_hookEngine.Initialize()) {
-            return FALSE;
-        }
+        DisableThreadLibraryCalls(hModule);
+
+        g_hookEngine.Initialize();
         break;
     case DLL_THREAD_ATTACH:
         break;
@@ -22,9 +20,12 @@ BOOL APIENTRY DllMain( HMODULE hModule,
         break;
     case DLL_PROCESS_DETACH:
 
+        if (lpReserved != nullptr) {
+
+            return TRUE;
+        }
         g_hookEngine.Shutdown();
         break;
     }
     return TRUE;
 }
-
