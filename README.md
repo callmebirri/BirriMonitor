@@ -191,7 +191,6 @@ Uses TLS (Thread Local Storage) to prevent recursive hook calls. When inside a h
 - Hooks WinHTTP only; does not support WinINet, socket API, or other HTTP libraries
 - Method C (DLL hijacking) is not implemented
 - DLL must be injected before the target process calls WinHTTP functions to ensure complete hooking
-- No HTTPS decryption support (raw data logging only)
 
 ## License
 
