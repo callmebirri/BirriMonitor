@@ -1,0 +1,303 @@
+# Non-Commercial Public License (NCPL)
+
+### Version 1.0
+
+**Copyright (c) 2026 birri**
+
+This License applies to the software known as **BirriMonitor** (the "Software"), and to all copies, Forks, and Derivative Works thereof, except as otherwise expressly stated herein.
+
+---
+
+## Preamble
+
+This License is designed to allow the Software to be freely used, studied, modified, and shared by individuals, educators, researchers, hobbyists, and open-source communities, while reserving to the Copyright Holder the exclusive right to derive commercial benefit from the Software. It is permissive with respect to modification and redistribution, and restrictive with respect to commercial exploitation. It is not a copyleft license: it does not require Derivative Works to be released under this License, to be open source, or to disclose their source code. It does, however, require that the Software itself — and any Derivative Work that incorporates it — remain free of Commercial Use unless separately authorized in writing by the Copyright Holder.
+
+If You do not agree to the terms of this License, You must not use, copy, modify, or distribute the Software.
+
+---
+
+## 1. Definitions
+
+Capitalized terms not otherwise defined have their ordinary meaning.
+
+**1.1 "Software"** means the original work of authorship made available under this License, including its Source Form and any Compiled Form, together with all associated documentation, data files, and configuration files distributed by the Copyright Holder as part of the same work.
+
+**1.2 "Source Form"** means the preferred human-readable form of the Software for making modifications to it, including source code, scripts, and configuration files.
+
+**1.3 "Compiled Form"** means any form of the Software resulting from mechanical transformation of Source Form, including compiled object code, minified code, packaged binaries, container images, and executable installers.
+
+**1.4 "Copyright Holder," "Licensor," or "We"** means birri, the original author and rights holder of the Software, and any successor or assign thereof.
+
+**1.5 "You" or "Licensee"** means the individual or legal entity exercising rights under this License.
+
+**1.6 "Derivative Work"** means any work that is based upon, derived from, or incorporates the Software, in whole or in material part, whether by modification, translation, adaptation, arrangement, or combination with other material, and that would constitute a derivative or adapted work under applicable copyright law. A **"Fork"** is a Derivative Work, or an unmodified copy, that is maintained, published, and developed independently of the Copyright Holder's original repository or distribution channel.
+
+**1.7 "Contribution"** means any Software, Derivative Work, patch, or modification voluntarily submitted by a **"Contributor"** to the Copyright Holder for inclusion in the Software.
+
+**1.8 "Distribute" or "Distribution"** means to make the Software or a Derivative Work available to any third party by any means, including by sale, rental, lease, lending, transmission, publication, public performance, hosting, or making available for download, streaming, or remote access.
+
+**1.9 "Significant Modification"** means any change to the Software that a reasonable user or developer would consider to materially alter its functionality, behavior, performance, security properties, or output, as distinguished from purely cosmetic, formatting, or trivial corrective changes.
+
+**1.10 "Commercial Use"** has the meaning set out in Section 5.1.
+
+**1.11 "Non-Commercial Use"** means any use of the Software that does not constitute Commercial Use, as further described in Section 5.
+
+**1.12 "Notice"** means any copyright notice, attribution statement, disclaimer, or reference to this License that the Copyright Holder has included with the Software, or that is required to be included under Section 4.
+
+---
+
+## 2. Grant of Rights
+
+**2.1 License Grant.** Subject to Your compliance with all conditions of this License, the Copyright Holder hereby grants You a worldwide, royalty-free, non-exclusive, non-sublicensable (except as provided in Section 6), revocable (as provided in Section 13) license to:
+
+(a) use the Software for any lawful Non-Commercial purpose, including personal, educational, academic, research, and internal evaluation purposes;
+
+(b) reproduce and copy the Software, in Source Form or Compiled Form;
+
+(c) study, modify, adapt, and translate the Software, and create Derivative Works based upon it;
+
+(d) merge or combine the Software with other software or materials;
+
+(e) publish, publicly display, and Distribute, free of charge, copies of the Software and Derivative Works, in Source Form or Compiled Form, to third parties; and
+
+(f) Fork the Software's repository or distribution and independently maintain, publish, and promote such Fork,
+
+in each case solely for Non-Commercial Use and subject to Sections 3, 4, 5, 6, and 7.
+
+**2.2 No Implied Licenses.** No rights are granted by implication, estoppel, or otherwise, except those expressly set out in this License. All rights not expressly granted are reserved by the Copyright Holder.
+
+**2.3 Conditions Precedent.** The rights granted in Section 2.1 are expressly conditioned on Your ongoing compliance with this License. Any exercise of these rights in violation of this License is unauthorized and outside the scope of this License.
+
+---
+
+## 3. Conditions
+
+Your exercise of any right granted under Section 2 is subject to each of the following conditions, which apply to every copy of the Software or any Derivative Work that You make, use, or Distribute:
+
+(a) **Preservation of Copyright Notice.** You must retain, in all copies of the Software or any Derivative Work, all copyright notices, author credits, and proprietary legends originally contained in or attached to the Software;
+
+(b) **Preservation of this License.** You must include a complete and unmodified copy of this License with every copy of the Software or any Derivative Work that You Distribute in Source Form. Where Distribution occurs solely in Compiled Form and inclusion of the full License text is not reasonably practicable, You must instead include a clear and prominent notice stating that the work is governed by this License, identifying its title and version, and stating where a complete copy of this License may be obtained free of charge;
+
+(c) **Attribution**, as further described in Section 4;
+
+(d) **Indication of Modifications**, as further described in Section 7;
+
+(e) **No Additional Restrictions.** You may not impose any additional legal terms, technical measures (including digital rights management), or conditions on the Software or a Derivative Work that would restrict a recipient's ability to exercise the rights granted under this License; and
+
+(f) **Pass-Through of Terms.** If You Distribute the Software or a Derivative Work to any third party, that third party automatically receives a license from the Copyright Holder under the same terms as this License, and You may not impose obligations or restrictions on that third party that are inconsistent with this License.
+
+Failure to comply with any condition in this Section 3 is a material breach of this License and is subject to Section 13 (Termination).
+
+---
+
+## 4. Attribution Requirements
+
+**4.1 Required Attribution.** Any copy, Distribution, public display, or Derivative Work of the Software must include a clear and reasonably prominent attribution statement identifying:
+
+(a) the name of the Software (**BirriMonitor**);
+
+(b) the name of the Copyright Holder;
+
+(c) a reference to this License by name and version; and
+
+(d) where reasonably available, a link or reference to the canonical source location of the Software (for example, its original repository URL).
+
+**4.2 Placement.** Attribution must appear in a location reasonably likely to be seen by recipients or end users, such as a `README`, `NOTICE`, `LICENSE`, "About" screen, documentation file, source code header, or comparable location. A suitable form of words is: *"Based on BirriMonitor by birri, used under the Non-Commercial Public License."*
+
+**4.3 No Removal or Obscuring.** You may not remove, obscure, alter, or falsify any attribution statement or Notice, except to the minimal extent necessary to correct factual inaccuracies or to add Your own attribution for Your own Contributions in addition to (not in place of) the required attribution.
+
+**4.4 No False Endorsement.** Attribution given under this Section must not state or imply that the Copyright Holder sponsors, endorses, or is affiliated with You, Your Fork, or Your Derivative Work, unless separately and expressly authorized in writing by the Copyright Holder.
+
+---
+
+## 5. Non-Commercial Restriction
+
+**5.1 Definition of "Commercial Use."** "Commercial Use" means any use, reproduction, Distribution, hosting, deployment, or other exploitation of the Software or any Derivative Work, in whole or in material part, that is intended for or directed toward commercial advantage, monetary compensation, or private financial gain, whether the gain is realized directly or indirectly. Without limiting the foregoing, Commercial Use includes, by way of illustration and not limitation:
+
+(a) selling, licensing, leasing, or renting the Software or any Derivative Work, in Source Form or Compiled Form, whether modified or unmodified, and whether alone or as part of a larger work;
+
+(b) charging any fee, price, or other monetary consideration for access to, download of, distribution of, or use of the Software or any Compiled Form thereof, including nominal, "at-cost," or "convenience" fees;
+
+(c) incorporating the Software, in whole or in part, into any product, application, plugin, template, or service that is sold, licensed for a fee, or offered as part of a paid bundle, including bundling the Software with paid software, paid hardware, or a paid installer;
+
+(d) offering the Software or a Derivative Work as a hosted, cloud-based, or Software-as-a-Service ("SaaS") offering for which end users pay a fee, subscription, or other consideration, or from which the operator otherwise derives revenue in connection with the offering;
+
+(e) using the Software to deliver paid consulting, integration, support, maintenance, hosting, or training services where the Software constitutes the primary subject matter or primary source of value of the service offered ("support-washing");
+
+(f) Distributing the Software or a Derivative Work through any channel that generates advertising revenue, referral revenue, affiliate revenue, sponsorship revenue, or other indirect monetary benefit attributable to that Distribution;
+
+(g) gating, unlocking, or offering enhanced features, functionality, priority access, or removal of limitations in exchange for donations, tips, pledges, subscriptions, or similar consideration tied to the Software;
+
+(h) reselling, re-licensing, or otherwise transferring for consideration a Fork, Derivative Work, or Compiled Form of the Software;
+
+(i) any use by, or on behalf of, a for-profit entity in connection with the generation of revenue, the reduction of costs passed on to paying customers, or the creation of a competitive commercial advantage, where the Software forms a material part of the commercial product, service, or infrastructure involved; and
+
+(j) any other direct or indirect method of monetization of the Software, however structured or labeled, that is designed or reasonably likely to circumvent the intent of this Section 5.
+
+**5.2 Restriction.** Except as expressly authorized in a separate written commercial license agreement executed by the Copyright Holder, You may NOT engage in Commercial Use of the Software or any Derivative Work, in whole or in part, in original or modified form. This restriction:
+
+(a) applies regardless of the license or terms You choose to apply to Your own original Contributions within a Derivative Work; and
+
+(b) applies to any Fork, Derivative Work, or Compiled Form to the extent that it incorporates, is derived from, depends upon, or could not reasonably exist or function without the Software.
+
+**5.3 Non-Commercial Use — Illustrative Safe Harbor.** For the avoidance of doubt, and without limiting the generality of Section 1.11, the following do not, by themselves, constitute Commercial Use:
+
+(a) hosting a free, publicly accessible copy, mirror, or Fork of the Software's Source Form on a platform such as GitHub or GitLab, provided no fee, subscription, or other consideration is charged for access to it;
+
+(b) forking, studying, modifying, or contributing to the Software as part of open-source collaboration, where no Contributor receives monetary compensation for the Software itself;
+
+(c) accepting unconditional, voluntary donations that do not unlock any feature, functionality, priority access, or other material benefit tied to the Software;
+
+(d) use of the Software for personal projects, hobbyist projects, academic coursework, classroom instruction, or non-commercial scholarly research and publication; and
+
+(e) internal, non-production evaluation, testing, or research use of the Software by an employee or contractor of a commercial entity, provided that the Software is not thereby incorporated into, or made a component of, any product or service offered to third parties.
+
+**5.4 Requesting Commercial Permission.** A party wishing to make Commercial Use of the Software must first obtain the prior written permission of the Copyright Holder, which may take the form of a separate commercial license agreement and may be subject to fees or other terms at the Copyright Holder's sole discretion. Requests may be directed to: **contact@qhuyy.tech**. Nothing in this License obligates the Copyright Holder to grant such permission on any particular terms, or at all.
+
+---
+
+## 6. Distribution
+
+**6.1 Permitted Distribution.** You may Distribute unmodified copies of the Software, and You may Distribute Derivative Works, in Source Form or Compiled Form, provided that:
+
+(a) such Distribution constitutes Non-Commercial Use under Section 5;
+
+(b) You comply with all conditions set out in Section 3;
+
+(c) You comply with the attribution requirements in Section 4; and
+
+(d) where the Distribution is a Derivative Work, You comply with Section 7.
+
+**6.2 Permitted Channels.** Permitted Non-Commercial Distribution includes, without limitation, free and publicly accessible source code repositories (such as GitHub or GitLab), free package registries, personal or organizational websites that do not charge for access to the Software, and physical or digital media provided to recipients at no charge.
+
+**6.3 Automatic Downstream License.** Each recipient to whom You lawfully Distribute the Software or a Derivative Work automatically receives a license from the Copyright Holder to exercise the rights granted in Section 2, subject to the same terms and conditions of this License, without the need for any further action by You or the Copyright Holder.
+
+**6.4 No Sublicensing Beyond This License.** You may not grant any rights in the Software or a Derivative Work that exceed, conflict with, or purport to waive the restrictions of this License, including the Non-Commercial Restriction in Section 5.
+
+---
+
+## 7. Modifications and Derivative Works
+
+**7.1 Right to Modify.** You may modify the Software and create Derivative Works, including Forks, for Non-Commercial Use, subject to this Section 7.
+
+**7.2 Indication of Modifications.** If You publicly Distribute a Derivative Work, You must include a clear and prominent statement that:
+
+(a) the work has been modified from the original Software;
+
+(b) identifies, with reasonable specificity (for example, through a changelog, release notes, `README` section, or source code comments), the nature and extent of any Significant Modification; and
+
+(c) does not represent, and is not reasonably likely to cause recipients to believe, that the Derivative Work is the official or original version of the Software, or that it is published, maintained, or endorsed by the Copyright Holder, unless that is in fact the case.
+
+**7.3 Ownership of Contributions.** As between You and the Copyright Holder, You retain ownership of the copyright in the original material that You author and add to a Derivative Work. You may apply Your own copyright notice to such original material, in addition to, and without prejudice to, the Copyright Holder's copyright and other rights in the underlying Software.
+
+**7.4 No Copyleft; Persistence of the Non-Commercial Restriction.** This License is not a copyleft or "share-alike" license. You are not required to release a Derivative Work under this License, under any open-source license, or under any particular terms, and You are not required to disclose the source code of Your own additions. However, because the Software remains subject to this License, any Derivative Work that incorporates, is derived from, or depends upon the Software remains subject to the Non-Commercial Restriction in Section 5 with respect to the Software so incorporated, regardless of the license terms You apply to Your own original Contributions.
+
+**7.5 Contributions Back to the Project.** You are not obligated to submit Contributions to the Copyright Holder. If You do submit a Contribution, You represent that You have the right to do so, and You grant the Copyright Holder a perpetual, worldwide, royalty-free, irrevocable, non-exclusive license to use, reproduce, modify, Distribute, and sublicense the Contribution, including for Commercial Use, as part of the Software, unless otherwise agreed in writing.
+
+---
+
+## 8. Third-Party Components
+
+**8.1 Separately Licensed Material.** The Software may include or depend upon components, libraries, or other materials that are owned by third parties and licensed under separate terms ("Third-Party Components"). Third-Party Components are identified, where applicable, in a `NOTICE`, `THIRD-PARTY-LICENSES`, or comparable file distributed with the Software.
+
+**8.2 No Effect on Third-Party Terms.** This License does not modify, limit, or expand the rights and obligations that apply to Third-Party Components under their own respective licenses. Your use of any Third-Party Component is governed solely by its own license terms, not by this License.
+
+**8.3 Conflicts.** In the event of a direct conflict between this License and the mandatory terms of a Third-Party Component's license as applied specifically to that component, the Third-Party Component's license controls solely with respect to that component.
+
+---
+
+## 9. Trademarks
+
+This License does not grant You any right to use the trade names, trademarks, service marks, product names, logos, or branding of the Copyright Holder, including the name **BirriMonitor**, except to the minimal extent necessary to comply with the attribution requirements of Section 4 and to make truthful, non-misleading statements regarding the origin and provenance of the Software. You may not use such names or marks, or any confusingly similar variant, as part of Your own product name, project name, domain name, or branding, or in any manner that implies sponsorship, endorsement, or affiliation, without the Copyright Holder's prior written consent.
+
+---
+
+## 10. Patent License
+
+**10.1 Grant.** Subject to the terms of this License, the Copyright Holder grants You a worldwide, royalty-free, non-exclusive patent license, under any patent claims owned or controlled by the Copyright Holder that are necessarily infringed by the unmodified Software as provided by the Copyright Holder, to make, use, and Distribute the Software, solely for Non-Commercial Use as defined in this License.
+
+**10.2 No Patent License for Commercial Use.** No patent license, express or implied, is granted under this License for any Commercial Use. A separate written agreement with the Copyright Holder is required to obtain any such license.
+
+**10.3 Patent Retaliation.** If You, or any entity on Your behalf, institute patent litigation against the Copyright Holder or any other party alleging that the Software, or any part of it, constitutes patent infringement, then all licenses granted to You under this License, including the patent license in Section 10.1, automatically terminate as of the date such litigation is filed.
+
+---
+
+## 11. Disclaimer of Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING WITHOUT LIMITATION ANY WARRANTIES OR CONDITIONS OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, ACCURACY, OR THAT THE SOFTWARE WILL BE ERROR-FREE, SECURE, OR OPERATE WITHOUT INTERRUPTION. THE ENTIRE RISK AS TO THE QUALITY, PERFORMANCE, AND SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE IS BORNE BY YOU. THE COPYRIGHT HOLDER MAKES NO REPRESENTATION THAT THE SOFTWARE IS FREE OF DEFECTS OR SUITABLE FOR ANY PARTICULAR USE.
+
+---
+
+## 12. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE COPYRIGHT HOLDER, ITS CONTRIBUTORS, OR ANY PARTY WHO MODIFIES OR DISTRIBUTES THE SOFTWARE BE LIABLE TO YOU OR ANY THIRD PARTY FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR FOR LOSS OF PROFITS, REVENUE, DATA, OR BUSINESS OPPORTUNITY, ARISING OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THIS LICENSE, WHETHER IN CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY, OR OTHERWISE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. IN NO EVENT SHALL THE COPYRIGHT HOLDER'S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THIS LICENSE EXCEED ZERO (0) MONETARY UNITS, THE SOFTWARE HAVING BEEN PROVIDED FREE OF CHARGE FOR NON-COMMERCIAL USE. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR LIMITATION OF CERTAIN DAMAGES, SO SOME OF THE ABOVE LIMITATIONS MAY NOT APPLY TO YOU.
+
+---
+
+## 13. Termination
+
+**13.1 Automatic Termination.** Your rights under this License terminate automatically, without notice, if You fail to comply with any term of this License, including, without limitation, the Non-Commercial Restriction in Section 5.
+
+**13.2 Effect of Termination.** Upon termination, You must immediately cease all use, reproduction, and Distribution of the Software and any Derivative Work, and must delete or destroy all copies in Your possession or control, except that You may retain archival copies solely to the extent required by applicable law or bona fide internal record-keeping obligations, provided such copies are not used for any purpose inconsistent with this License.
+
+**13.3 Third Parties Unaffected.** Termination of Your rights under this License does not affect the rights of any third party who received the Software or a Derivative Work from You in compliance with this License, provided that such third party remains in compliance with this License.
+
+**13.4 Survival.** Sections 1 (Definitions), 9 (Trademarks), 11 (Disclaimer of Warranty), 12 (Limitation of Liability), 13.2 through 13.4, 15 (Governing Law and Interpretation), and 16 (Entire Agreement) survive termination of this License, as do any other obligations that by their nature are intended to survive.
+
+---
+
+## 14. Reinstatement After Violation
+
+**14.1 Cure for First-Time, Inadvertent Violations.** If this is Your first violation of this License, and You cure the violation within thirty (30) days of first becoming aware of it, or within thirty (30) days of receiving notice of the violation from the Copyright Holder, whichever occurs first, then Your license is automatically reinstated as of the date of the cure, unless and until the Copyright Holder terminates it by further written notice.
+
+**14.2 Discretionary Reinstatement.** The Copyright Holder may, at its sole discretion, reinstate Your rights under this License by written notice, on such terms as the Copyright Holder deems appropriate, following any violation.
+
+**14.3 Repeated or Willful Violations.** Section 14.1 does not apply to repeated violations of this License, or to any violation of Section 5 (Non-Commercial Restriction) that the Copyright Holder reasonably determines to be knowing, willful, or in bad faith. In such cases, reinstatement, if any, is solely within the discretion of the Copyright Holder under Section 14.2.
+
+**14.4 Other Remedies Unaffected.** Nothing in this Section 14 limits any other legal or equitable remedy available to the Copyright Holder, including injunctive relief, for any violation of this License.
+
+---
+
+## 15. Governing Law and Interpretation
+
+**15.1 Governing Law.** This License is governed by, and construed in accordance with, the laws of **Vietnam**, without regard to its conflict-of-laws principles, except to the extent such laws are preempted by or inconsistent with applicable copyright or patent law.
+
+**15.2 Venue.** Any dispute arising out of or relating to this License shall be subject to the exclusive jurisdiction of the courts located in **Vietnam**, and each party consents to personal jurisdiction and venue therein.
+
+**15.3 Interpretation.** Section headings are for convenience only and do not affect interpretation. The word "including" means "including, without limitation." The singular includes the plural and vice versa, as the context requires. This License has been drafted in the English language; any translation is provided for convenience only, and the English-language version controls in the event of any conflict.
+
+**15.4 Severability.** If any provision of this License is held to be invalid or unenforceable, that provision shall be limited or eliminated to the minimum extent necessary, and the remaining provisions shall remain in full force and effect.
+
+**15.5 No Waiver.** The failure of the Copyright Holder to enforce any provision of this License shall not be construed as a waiver of that provision or of any other provision.
+
+**15.6 No Partnership.** Nothing in this License creates a partnership, joint venture, agency, or employment relationship between You and the Copyright Holder.
+
+**15.7 Assignment.** You may not assign or transfer this License or any rights granted hereunder without the prior written consent of the Copyright Holder. The Copyright Holder may freely assign this License and its rights hereunder, including in connection with a merger, acquisition, or sale of substantially all relevant assets.
+
+---
+
+## 16. Entire Agreement
+
+**16.1 Entire Agreement.** This License constitutes the entire agreement between You and the Copyright Holder concerning the Software and supersedes all prior or contemporaneous oral or written understandings, representations, or agreements regarding its subject matter, except for any separate written commercial license agreement executed by the Copyright Holder, which shall control with respect to the Commercial Use it authorizes.
+
+**16.2 Amendment; Revised Versions.** This License may not be amended except by a written instrument signed by the Copyright Holder, or by the Copyright Holder's publication of a revised version of this License. The Copyright Holder may publish revised or new versions of this License from time to time. Unless You expressly elect to adopt a later version, any copy of the Software You have received continues to be governed by the version of this License under which it was received. The Copyright Holder is under no obligation to publish future versions of this License.
+
+**16.3 No Third-Party Beneficiaries.** Except as expressly stated in Section 6.3 (Automatic Downstream License), this License does not confer any rights or remedies upon any person or entity other than You and the Copyright Holder.
+
+---
+
+### Appendix A — Suggested Notice for Source Files (Informative)
+
+To help recipients identify the terms governing a file, the Copyright Holder and Contributors may include a notice substantially similar to the following at the top of each Source Form file:
+
+```
+Copyright (c) 2026 birri
+
+This file is part of BirriMonitor and is licensed under the
+Non-Commercial Public License (NCPL), Version 1.0.
+Commercial Use is prohibited without prior written permission.
+See the LICENSE file distributed with this work, or https://github.com/callmebirri/BirriMonitor,
+for the full text of the License.
+```
+
+This Appendix is provided for convenience and does not itself impose obligations beyond those set out in Sections 1 through 16 above.
