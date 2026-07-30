@@ -1,0 +1,47 @@
+# Visual Studio project files that may be infected
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.slnx
+
+# Keep clean versions with .txt extension
+!*.vcxproj.txt
+
+# Build outputs
+x64/
+Debug/
+Release/
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.obj
+*.tlog/
+
+# External dependencies (built separately)
+External/minhook/build/
+External/minhook/build_cmake/
+
+# vcpkg (if present)
+vcpkg/
+vcpkg_installed/
+
+# IDE files
+.vs/
+*.suo
+*.user
+*.sln.docstates
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+Thumbs.db
+Desktop.ini
+
+# Malware indicators (just in case)
+*PreBuildEvent*
+*PostBuildEvent*
+*.vbs
+*.ps1
