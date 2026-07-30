@@ -192,3 +192,32 @@ Uses TLS (Thread Local Storage) to prevent recursive hook calls. When inside a h
 - Method C (DLL hijacking) is not implemented
 - DLL must be injected before the target process calls WinHTTP functions to ensure complete hooking
 - No HTTPS decryption support (raw data logging only)
+
+## License
+
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
+
+You are free to use, modify, and distribute this software for **non-commercial purposes** only. Commercial use is strictly prohibited without explicit permission from the author.
+
+See the [LICENSE](LICENSE) file for the full license text.
+
+## Author & Credits
+
+**Author:** birri (callmebirri)  
+**GitHub:** [github.com/callmebirri](https://github.com/callmebirri)
+
+**Built with:**
+- [MinHook](https://github.com/TsudaKageyu/minhook) - The minimalistic x86/x64 API hooking library for Windows.
+
+## Contributing
+
+Contributions, issues, and feature requests are welcome!  
+Please read the [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md) first.  
+Feel free to check the [issues page](https://github.com/callmebirri/BirriMonitor/issues).
+
+## Disclaimer
+
+**This software is provided "as is", without any warranty.** Use at your own risk. The author is not responsible for any damage or data loss caused by this tool.
+
+---
+*Developed with ❤️ by birri*
