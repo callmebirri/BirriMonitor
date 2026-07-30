@@ -1,12 +1,3 @@
-# Visual Studio project files that may be infected
-*.vcxproj
-*.vcxproj.filters
-*.vcxproj.user
-*.slnx
-
-# Keep clean versions with .txt extension
-!*.vcxproj.txt
-
 # Build outputs
 x64/
 Debug/
